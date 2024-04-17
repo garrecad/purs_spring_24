@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:purs_spring_24/src/camera/camera_preview.dart';
 import 'package:purs_spring_24/src/donate/donate_view.dart';
 import 'package:purs_spring_24/src/home/home_view.dart';
+import 'package:purs_spring_24/src/test/test_view.dart';
 
 class NavigationTemplate extends StatelessWidget {
   final Widget body;
@@ -33,7 +34,7 @@ class NavigationTemplate extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => NavigationTemplate(
-                body: const HomeView(),
+                body: const PageViewExample(),
               ),
             ),
           );

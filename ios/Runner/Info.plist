@@ -33,6 +33,8 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>Explanation on why the microphone access is needed.</string>
     <key>UISupportedInterfaceOrientations</key>
+    <key>NFCReaderUsageDescription</key>
+    <string>Your explanation of why the app needs NFC</string>
     <array>
       <string>UIInterfaceOrientationPortrait</string>
     </array>
