@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
@@ -21,7 +19,7 @@ class _PageViewExampleState extends State<PageViewExample>
   late PageController _pageViewController;
   late TabController _tabController;
   int _currentPageIndex = 0;
-  Map<String, dynamic>? _nfcData = jsonDecode("{}") as Map<String, dynamic>;
+  String _nfcData = "test";
 
   String defaultApplePayConfigString = defaultApplePay;
   String defaultGooglePayConfigString = defaultGooglePay;
@@ -41,6 +39,7 @@ class _PageViewExampleState extends State<PageViewExample>
     super.initState();
     _pageViewController = PageController();
     _tabController = TabController(length: 3, vsync: this);
+    NfcManager.instance.startSession(onDiscovered: _NFCDiscovered);
   }
 
   @override
@@ -48,6 +47,7 @@ class _PageViewExampleState extends State<PageViewExample>
     super.dispose();
     _pageViewController.dispose();
     _tabController.dispose();
+    NfcManager.instance.stopSession();
   }
 
   @override
@@ -136,22 +136,11 @@ class _PageViewExampleState extends State<PageViewExample>
                                     "Scan the NFC tag on the animal's kennel"),
                               ),
                               const Icon(Icons.nfc_rounded, size: 100),
-                              FutureBuilder<Map<String, dynamic>>(
-                                future: _startNFCReading(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const CircularProgressIndicator();
-                                  } else if (snapshot.hasError) {
-                                    return Text('Error: ${snapshot.error}');
-                                  } else {
-                                    _nfcData = snapshot.data;
-                                    // Update UI when NFC data is fetched
-                                    return Text(
-                                        'NFC Tag Data: $_nfcData, $temp');
-                                  }
-                                },
-                              ),
+                              // TextButton(
+                              //   onPressed: _readNfcTag,
+                              //   child: const Text("Read"),
+                              // ),
+                              Text("Data: {$_nfcData}"),
                             ],
                           ),
                         ),
@@ -359,6 +348,41 @@ class _PageViewExampleState extends State<PageViewExample>
     );
   }
 
+  // https://medium.com/@antonioneus/reading-and-writing-nfc-using-nfcmanager-in-flutter-dc5420991967
+  Future<void> _NFCDiscovered(NfcTag badge) async {
+    // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //   content: Text("NFC Discovered"),
+    // ));
+    var ndef = Ndef.from(badge);
+
+    if (ndef != null && ndef.cachedMessage != null) {
+      String tempRecord = "";
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(ndef.),
+      ));
+
+      for (var record in ndef.cachedMessage!.records) {
+        tempRecord =
+            "$tempRecord ${String.fromCharCodes(record.payload.sublist(record.payload[0] + 1))}";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(tempRecord),
+      ));
+
+      setState(() {
+        _nfcData = tempRecord;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("bad NFC tag"),
+        ),
+      );
+    }
+  }
+
   bool get _isOnDesktopAndWeb {
     if (kIsWeb) {
       return true;
@@ -373,38 +397,6 @@ class _PageViewExampleState extends State<PageViewExample>
       case TargetPlatform.fuchsia:
         return false;
     }
-  }
-
-  Future<Map<String, dynamic>> _startNFCReading() async {
-    Map<String, dynamic> data = jsonDecode("{}") as Map<String, dynamic>;
-
-    temp = temp + 1;
-
-    try {
-      bool isAvailable = await NfcManager.instance.isAvailable();
-
-      //We first check if NFC is available on the device.
-      if (isAvailable) {
-        //If NFC is available, start an NFC session and listen for NFC tags to be discovered.
-        NfcManager.instance.startSession(
-          onDiscovered: (NfcTag tag) async {
-            // Process NFC tag, When an NFC tag is discovered, print its data to the console.
-            debugPrint('NFC Tag Detected: ${tag.data}');
-            data = tag.data;
-          },
-          // );
-        ).timeout(const Duration(seconds: 30));
-      } else {
-        debugPrint('NFC not available.');
-        data = jsonDecode("{\"debug\": \"not available\"}")
-            as Map<String, dynamic>;
-      }
-    } catch (e) {
-      debugPrint('Error reading NFC: $e');
-      data = jsonDecode("{\"debug\": \"error: $e\"}") as Map<String, dynamic>;
-    }
-
-    return data;
   }
 }
 
