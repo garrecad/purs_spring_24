@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:pay/pay.dart';
 import 'package:purs_spring_24/src/test/payment_configurations.dart';
+import 'package:share_plus/share_plus.dart';
 
 int temp = 0;
 
@@ -32,6 +33,8 @@ class _PageViewExampleState extends State<PageViewExample>
       status: PaymentItemStatus.final_price,
     )
   ];
+
+  int _selectedPayment = 0;
 
   @override
   void initState() {
@@ -72,52 +75,142 @@ class _PageViewExampleState extends State<PageViewExample>
                   const Padding(
                     padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                     child: Text(
-                      "Step 1.",
+                      "Step 1. Pet Info",
                       style: TextStyle(fontWeight: FontWeight.bold),
                       textAlign: TextAlign.right,
                       textScaler: TextScaler.linear(2),
                     ),
                   ),
                   const Divider(),
+                  FutureBuilder(
+                    future: NfcManager.instance.isAvailable(),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == false) {
+                        return Expanded(
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const Text("NFC unavailable"),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                TextButton(
+                                  onPressed: () => ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    const SnackBar(
+                                      content: Text("MOCKED"),
+                                    ),
+                                  ),
+                                  child: const Expanded(
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Enter their information manually",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                decoration:
+                                                    TextDecoration.underline),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
+                                child: Text(
+                                    "Scan the NFC tag on the animal's kennel"),
+                              ),
+                              const Icon(Icons.nfc_rounded, size: 100),
+                              FutureBuilder<Map<String, dynamic>>(
+                                future: _startNFCReading(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const CircularProgressIndicator();
+                                  } else if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  } else {
+                                    _nfcData = snapshot.data;
+                                    // Update UI when NFC data is fetched
+                                    return Text(
+                                        'NFC Tag Data: $_nfcData, $temp');
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      child: Text(
+                        "Step 2. Share",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                        textScaler: TextScaler.linear(2),
+                      ),
+                    ),
+                  ),
+                  const Divider(),
                   Expanded(
                     child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
-                            child:
-                                Text("Scan the NFC tag on the animal's kennel"),
+                      child: TextButton(
+                        onPressed: _sharePressed,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.share),
+                            Text(
+                                "Share your picture on social media to earn points!"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Divider(),
+                  const Expanded(
+                    child: Center(
+                        child: Flexible(
+                            child: Text(
+                                "Upload your photo to the animal's profile on our website"))),
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: FloatingActionButton.extended(
+                        onPressed: () =>
+                            ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("MOCKED"),
                           ),
-                          const Icon(Icons.nfc_rounded, size: 100),
-                          TextButton(
-                            onPressed: () =>
-                                ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("MOCKED"),
-                              ),
-                            ),
-                            child: const Text(
-                              "Or enter their information manually",
-                              style: TextStyle(fontStyle: FontStyle.italic),
-                            ),
-                          ),
-                          FutureBuilder<Map<String, dynamic>>(
-                            future: _startNFCReading(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                _nfcData = snapshot.data;
-                                // Update UI when NFC data is fetched
-                                return Text('NFC Tag Data: $_nfcData, $temp');
-                              }
-                            },
-                          ),
-                        ],
+                        ),
+                        label: const Row(
+                          children: [Icon(Icons.upload), Text("Upload")],
+                        ),
                       ),
                     ),
                   ),
@@ -129,7 +222,7 @@ class _PageViewExampleState extends State<PageViewExample>
                   const Padding(
                     padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                     child: Text(
-                      "Step 2.",
+                      "Sponsor",
                       style: TextStyle(fontWeight: FontWeight.bold),
                       textAlign: TextAlign.right,
                       textScaler: TextScaler.linear(2),
@@ -141,14 +234,67 @@ class _PageViewExampleState extends State<PageViewExample>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          const Expanded(child: SizedBox()),
+                          Container(
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.75),
+                            child: const Text(
+                              "Sponsoring an animal helps your favorite Heartland pet to get adopted.",
+                              overflow: TextOverflow.visible,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          SegmentedButton(
+                            segments: const [
+                              ButtonSegment(
+                                value: 0,
+                                label: Text("\$"),
+                              ),
+                              ButtonSegment(
+                                value: 1,
+                                label: Text("\$\$"),
+                              ),
+                              ButtonSegment(
+                                value: 2,
+                                label: Text("\$\$\$"),
+                              ),
+                            ],
+                            selected: <int>{_selectedPayment},
+                            onSelectionChanged: (newSelection) => {
+                              setState(() {
+                                _selectedPayment = newSelection.first;
+                              })
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            switch (_selectedPayment) {
+                              0 => "\$35",
+                              1 => "\$50",
+                              2 => "\$150",
+                              _ => "0",
+                            },
+                          ),
+                          const Expanded(child: SizedBox()),
                           GooglePayButton(
                             paymentConfiguration:
                                 PaymentConfiguration.fromJsonString(
                                     defaultGooglePayConfigString),
-                            paymentItems: const [
+                            paymentItems: [
                               PaymentItem(
-                                label: 'Total',
-                                amount: '0.01',
+                                label: 'Sponsor Total',
+                                amount: switch (_selectedPayment) {
+                                  0 => "35",
+                                  1 => "50",
+                                  2 => "150",
+                                  _ => "0",
+                                },
                                 status: PaymentItemStatus.final_price,
                               )
                             ],
@@ -158,6 +304,9 @@ class _PageViewExampleState extends State<PageViewExample>
                             loadingIndicator: const Center(
                               child: CircularProgressIndicator(),
                             ),
+                          ),
+                          const SizedBox(
+                            height: 10,
                           ),
                         ],
                       ),
@@ -178,6 +327,15 @@ class _PageViewExampleState extends State<PageViewExample>
     );
   }
 
+  void _sharePressed() async {
+    final result = await Share.shareWithResult('This is the share text',
+        subject: "#HeartlandHumaneSociety");
+
+    if (result.status == ShareResultStatus.success) {
+      print("success: $result");
+    }
+  }
+
   void _onGooglePayResult(paymentResult) {
     // Send the resulting Google Pay token to your server / PSP
   }
@@ -190,10 +348,6 @@ class _PageViewExampleState extends State<PageViewExample>
     setState(() {
       _currentPageIndex = currentPageIndex;
     });
-
-    if (currentPageIndex == 0) {
-      _startNFCReading();
-    }
   }
 
   void _updateCurrentPageIndex(int index) {
