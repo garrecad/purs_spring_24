@@ -1,11 +1,10 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:purs_spring_24/src/camera/camera_preview.dart';
+import 'package:purs_spring_24/src/home/home_view.dart';
+import 'package:purs_spring_24/src/navigation_template.dart';
 
-import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -14,11 +13,9 @@ class MyApp extends StatelessWidget {
   const MyApp({
     super.key,
     required this.settingsController,
-    required this.camera,
   });
 
   final SettingsController settingsController;
-  final CameraDescription camera;
 
   @override
   Widget build(BuildContext context) {
@@ -70,15 +67,20 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
+                Widget body;
                 switch (routeSettings.name) {
+                  case HomeView.routeName:
+                    body = const HomeView();
+                    break;
                   case SettingsView.routeName:
-                    return SettingsView(controller: settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
+                    body = SettingsView(controller: settingsController);
+                    break;
+                  case TakePictureScreen.routeName:
+                    body = const TakePictureScreen();
                   default:
-                    return TakePictureScreen(camera: camera);
+                    body = const HomeView();
                 }
+                return NavigationTemplate(body: body);
               },
             );
           },

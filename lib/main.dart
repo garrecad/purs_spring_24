@@ -5,6 +5,8 @@ import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 
+late CameraDescription camera;
+
 void main() async {
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
@@ -27,7 +29,7 @@ void main() async {
   final cameras = await availableCameras();
 
   // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
+  camera = cameras.first;
 
-  runApp(MyApp(settingsController: settingsController, camera: firstCamera));
+  runApp(MyApp(settingsController: settingsController));
 }
