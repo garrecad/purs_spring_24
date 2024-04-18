@@ -4,11 +4,16 @@ import 'package:purs_spring_24/src/donate/donate_view.dart';
 import 'package:purs_spring_24/src/home/home_view.dart';
 import 'package:purs_spring_24/src/test/test_view.dart';
 
-class NavigationTemplate extends StatelessWidget {
+class NavigationTemplate extends StatefulWidget {
+  const NavigationTemplate({super.key, required this.body});
+
   final Widget body;
 
-  NavigationTemplate({super.key, required this.body});
+  @override
+  _NavigationTemplateState createState() => _NavigationTemplateState();
+}
 
+class _NavigationTemplateState extends State<NavigationTemplate> {
   int _currentPageIndex = 0;
 
   final List<BottomNavigationBarItem> _bottomNavigationBarItems = const [
@@ -33,8 +38,8 @@ class NavigationTemplate extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => NavigationTemplate(
-                body: const PageViewExample(),
+              builder: (context) => const NavigationTemplate(
+                body: PageViewExample(),
               ),
             ),
           );
@@ -44,8 +49,8 @@ class NavigationTemplate extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => NavigationTemplate(
-                body: const TakePictureScreen(),
+              builder: (context) => const NavigationTemplate(
+                body: TakePictureScreen(),
               ),
             ),
           );
@@ -55,8 +60,8 @@ class NavigationTemplate extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => NavigationTemplate(
-                body: const DonateView(),
+              builder: (context) => const NavigationTemplate(
+                body: DonateView(),
               ),
             ),
           );
@@ -66,8 +71,8 @@ class NavigationTemplate extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => NavigationTemplate(
-                body: const HomeView(),
+              builder: (context) => const NavigationTemplate(
+                body: HomeView(),
               ),
             ),
           );
@@ -83,7 +88,7 @@ class NavigationTemplate extends StatelessWidget {
         items: _bottomNavigationBarItems,
         onTap: (int index) => _onTapFunction(index, context),
       ),
-      body: body,
+      body: widget.body,
     );
   }
 }

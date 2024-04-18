@@ -19,18 +19,9 @@ class _PageViewExampleState extends State<PageViewExample>
   late PageController _pageViewController;
   late TabController _tabController;
   int _currentPageIndex = 0;
-  String _nfcData = "test";
 
   String defaultApplePayConfigString = defaultApplePay;
   String defaultGooglePayConfigString = defaultGooglePay;
-
-  final _paymentItems = [
-    const PaymentItem(
-      label: 'Total',
-      amount: '99.99',
-      status: PaymentItemStatus.final_price,
-    )
-  ];
 
   int _selectedPayment = 0;
 
@@ -54,7 +45,7 @@ class _PageViewExampleState extends State<PageViewExample>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Title"),
+        title: const Text("Upload Photo"),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -125,22 +116,17 @@ class _PageViewExampleState extends State<PageViewExample>
                         );
                       }
 
-                      return Expanded(
+                      return const Expanded(
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.fromLTRB(0, 14, 0, 14),
                                 child: Text(
                                     "Scan the NFC tag on the animal's kennel"),
                               ),
-                              const Icon(Icons.nfc_rounded, size: 100),
-                              // TextButton(
-                              //   onPressed: _readNfcTag,
-                              //   child: const Text("Read"),
-                              // ),
-                              Text("Data: {$_nfcData}"),
+                              Icon(Icons.nfc_rounded, size: 100),
                             ],
                           ),
                         ),
@@ -317,7 +303,8 @@ class _PageViewExampleState extends State<PageViewExample>
   }
 
   void _sharePressed() async {
-    final result = await Share.shareWithResult('This is the share text',
+    final result = await Share.shareWithResult(
+        'Share your photo to social media with #HeartlandHumaneSociety!',
         subject: "#HeartlandHumaneSociety");
 
     if (result.status == ShareResultStatus.success) {
@@ -358,10 +345,6 @@ class _PageViewExampleState extends State<PageViewExample>
     if (ndef != null && ndef.cachedMessage != null) {
       String tempRecord = "";
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(ndef.),
-      ));
-
       for (var record in ndef.cachedMessage!.records) {
         tempRecord =
             "$tempRecord ${String.fromCharCodes(record.payload.sublist(record.payload[0] + 1))}";
@@ -371,9 +354,9 @@ class _PageViewExampleState extends State<PageViewExample>
         content: Text(tempRecord),
       ));
 
-      setState(() {
-        _nfcData = tempRecord;
-      });
+      // setState(() {
+      //   _nfcData = tempRecord;
+      // });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

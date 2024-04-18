@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:purs_spring_24/main.dart';
+import 'package:purs_spring_24/src/test/test_view.dart';
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
@@ -73,19 +74,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
             // Attempt to take a picture and get the file `image`
             // where it was saved.
-            final image = await _controller.takePicture();
+            await _controller.takePicture();
 
             if (!context.mounted) return;
 
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-                ),
-              ),
+              MaterialPageRoute(builder: (context) => const PageViewExample()),
             );
           } catch (e) {
             // If an error occurs, log the error to the console.

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:purs_spring_24/src/camera/camera_preview.dart';
+import 'package:purs_spring_24/src/donate/donate_view.dart';
 import 'package:purs_spring_24/src/home/home_view.dart';
 import 'package:purs_spring_24/src/navigation_template.dart';
-import 'package:purs_spring_24/src/test/test_view.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -71,15 +71,19 @@ class MyApp extends StatelessWidget {
                 Widget body;
                 switch (routeSettings.name) {
                   case HomeView.routeName:
-                    body = const PageViewExample();
+                    body = const HomeView();
                     break;
                   case SettingsView.routeName:
                     body = SettingsView(controller: settingsController);
                     break;
                   case TakePictureScreen.routeName:
                     body = const TakePictureScreen();
+                    break;
+                  case DonateView.routeName:
+                    body = const DonateView();
+                    break;
                   default:
-                    body = const PageViewExample();
+                    body = const HomeView();
                 }
                 return NavigationTemplate(body: body);
               },
